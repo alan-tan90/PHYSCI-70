@@ -57,6 +57,7 @@ int configLights(int ledoff, int ledon) {
   
   return ++ledStates;
 }
+// The function only runs if the button is held. I needed a lot of if statements because the lights would all light up on their own, otherwise.
 void loop() {
   buttonState = digitalRead(buttonPin);
 
@@ -98,9 +99,9 @@ void loop() {
     digitalWrite(led7, LOW);
     digitalWrite(led8, LOW);
     // I missed these three.
-  digitalWrite(led0, LOW);
-  digitalWrite(ledm1, LOW);
-  digitalWrite(ledm2, LOW);
+    digitalWrite(led0, LOW);
+    digitalWrite(ledm1, LOW);
+    digitalWrite(ledm2, LOW);
     ledStates = 0;
   }
 }
