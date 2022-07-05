@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<!DOCTYPE css>
+<html lang="en">
+
+<title>PHYSCI 70: Intro to Digital Fabrication </title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+
+<body>
+
+
+<xmp theme="cyborg" style="display:none; align:center;" align="center">
+
+  ### Week 4: Microcontroller Programming
+
+  Arduino boards are not just power sources; they are programmable machines that are capable of making awesome circuitry! What each of us did was program somewhat-basic commands in a subset of the C programming language for the Board to send power signals to a connecting breadboard. I chose to light up LEDs, although many others opted to use their motors.
+  
+  Here is my project for this week:
+  
+  ![Messy Loading Screen](./pictures/final_25percent.jpg)
+  ##### This is a sequence of LEDs. I configured the lighting so that it looks like a
+  ##### loading screen. There are a lot of wires in the way, however. That is
+  ##### unavoidable. At the bottom of the page, there will be a video demonstration.
+  
+
+  ### Development: The Basics
+  
+  I couldn't remember exactly what I did to configure a circuit so that pressing a button activates an LED. I looked at a few tutorials, but I (at the time) did not want to cut too many wires to fit a demonstration if there was no need to. Also, some of them required 220-ohm resistors, resistors that I thought we did not have access to. Also, each tutorial assumed that I had a 4-legged button instead of a 2-legged one, so I could not reproduce the demonstrations verbatim.
+  
+  Eventually, I did receive help from another person. I now understand that the button should span multiple rows. The button pin and the 5-volt pin were on the input side of the button, and the necessary outputs to the ground pin resided on the other side. Also, the key to the circuit was that I could power one row from a column marked with the + sign.
+  As for the light, I had a current start at pin #13, pass through a 10,000-ohm resistor, pass through an LED, and eventually into the ground pin. The basic diagram is shown here:
+  ![Basic Configuration side-by-side](./pictures/basic_config.png)
+  ##### On the left, there is an optical illusion, which is kind of funny.
+  ##### It looks like the LED is in-between the resistor; if that was the case, then the LED would not function properly.
+  
+  When testing this setup, I realized that I needed another resistor by the button for similar reasons why there had to be one next to the LED.
+  
+  Click the following image to see a zoomed-in version:
+  
+  <a href="./pictures/alt_config2.jpg">
+  ![Above configuration with added resistor](./pictures/alt_config1_20percent.jpg)
+  </a>
+  
+  ### Development: The Project
+  
+  After the success with lighting up an LED from a button, the last thing I needed to know was that adding extra lights required parallel wiring and the usage of more pins from the Arduino. I could have connected the resistors and LEDs in series, but since I was trying to replicate a circuit that worked, that was not feasible. Thus, my original idea for a loading screen, which was supposed to be a circle, could not work. I thought that if I put multiple LEDs on the same row, then either both would be powered at the same time, or there wouldn't be enough space to fit the resistors and other wires in a way that connects both halves of the breadboard together. This is a picture of the old idea:
+  
+  ![Old idea LED configuration](./pictures/old_lights_idea_25percent.png)
+  
+  Glee exuded from my body when both lights flashed one after the other. Also, I ported over my proof-of-concept circuit to a larger breadboard because I overestimated how much space I needed to fit many lights and append them to the circuit properly. I didn't even know that we could even use larger breadboards!
+  
+  <video width="800" height="450" controls> <source src="./videos/small_success.mp4" type="video/mp4"> Your browser does not support the video tag.</video>
+
+  After configuring a third light, I ran into a problem. Why was the 3rd light not working? One of the teacher assistants brought to my attention that the first light worked only because the resistor's metal ends were on opposite sides of the breadboard; in other words, it bridged a connection within the row from that LED pin to the ground wire. The teacher assistant's other key piece of advice was that I could configure one of the wires so that one end stays on the side marked with the − sign, while the other end can cross the middle of the row, completing the circuit for that row.
+  
+  ![Three lights, but only two of them would work.](./pictures/three_lights_in_succession_25percent.jpg)
+  
+  ### End Result
+  
+  For once, the result was a success. I filmed the demonstration:
+  
+  <video width="900" height="500" controls> <source src="./videos/final.mp4" type="video/mp4"> Your browser does not support the video tag.</video>
+  
+  ##### Pressing the button and releasing it shortly after plays one iteration of the sequence of LEDs flashing. Holding down the button allows the
+  ##### loading screen to loop over and over indefinitely. The user has to release the button and wait for the current iteration to stop.
+  
+  Unfortunately, one downside to this circuit was that, since I had over 10 LEDs hooked up to their own Arduino pins, the wires covered up a significant portion of the breadboard. There was no way to avoid this. Also, I had to remove the last three resistors because the last two LEDs were abnormally dim. Failing to consider that this was not a series circuit, I thought one of the solutions was to minimize the voltage drop. That solution did not work. I swapped the 9th LED with the 1st one, and the reason is definitely not a faulty LED. Also, I am pretty sure that I mirrored the wire configuration for the last 2 lights accurately. Another reason could be that I forgot to update some setup code in the Arduino program (I intended for the circuit to have 8 lights at first.), but if that were the case, then the LEDs should not have worked at all.
+
+</xmp>
+<!-- Dimensions: 1176 by 2328 -->
+<h3>Circuit and Code<h3>
+<img src="./sketches/circuit.jpg" width="235" height="465"></img>
+<style align="left">
+pre {
+  background-color: #eceff4;
+  padding: 2px;
+  align: left;
+}
+</style>
+<pre align="left">
+<code align="left">
+
+// Define constants, mainly for the pins.
+const int buttonPin = 2;
+int buttonState = 0;
+int ledStates;
+const int led8 = 13;
+const int led7 = 12;
+const int led6 = 11;
+const int led5 = 10;
+const int led4 = 9;
+const int led3 = 8;
+const int led2 = 7;
+const int led1 = 6;
+const int led0 = 5;
+const int ledm1 = 4;
+const int ledm2 = 3;
+const int DELAY = 200;
+const int LAST_STATE = 10;
+
+// Define the pins and buttons, and reset which light should light up first.
+void setup() {
+  Serial.begin(9600);
+  // I forgot these three when filming the demonstration. There was no significant difference.
+  pinMode(ledm2, OUTPUT);
+  pinMode(ledm1, OUTPUT);
+  pinMode(led0, OUTPUT);
+  // I did not forget these ones.
+  pinMode(led1, OUTPUT);
+  pinMode(led2, OUTPUT);
+  pinMode(led3, OUTPUT);
+  pinMode(led4, OUTPUT);
+  pinMode(led5, OUTPUT);
+  pinMode(led6, OUTPUT);
+  pinMode(led7, OUTPUT);
+  pinMode(led8, OUTPUT);
+  pinMode(buttonPin, INPUT);
+  ledStates = 0;
+}
+
+// This was called many times.
+// This function takes in an LED to turn off, and the next LED to turn on. It prints a bunch of debug text, and increments the ledStates variable,
+// giving permission for the next light to be passed through this function.
+int configLights(int ledoff, int ledon) {
+  Serial.print("State ");
+  Serial.print(ledStates);
+  Serial.print("\n");
+  digitalWrite(ledoff, LOW);
+  digitalWrite(ledon, HIGH);
+  delay(DELAY);
+  
+  
+  Serial.print("LED ");
+  Serial.print(ledon);
+  Serial.print(" on\n");
+  Serial.print("LED ");
+  Serial.print(ledoff);
+  Serial.print(" off\n");
+  
+  return ++ledStates;
+}
+// The function only runs if the button is held. I needed a lot of if statements because the lights would all light up on their own, otherwise.
+void loop() {
+  buttonState = digitalRead(buttonPin);
+
+  if (buttonState == HIGH) {
+    if(!ledStates)
+      ledStates = configLights(ledm2, led8);
+    if(ledStates == 1)
+      ledStates = configLights(led8, led7);
+    if(ledStates == 2)
+      ledStates = configLights(led7, led6);
+    if(ledStates == 3)
+      ledStates = configLights(led6, led5);
+    if(ledStates == 4)
+      ledStates = configLights(led5, led4);  
+    if(ledStates == 5)
+      ledStates = configLights(led4, led3);
+    if(ledStates == 6)
+      ledStates = configLights(led3, led2); 
+    if(ledStates == 7)
+      ledStates = configLights(led2, led1);
+    if(ledStates == 8)
+      ledStates = configLights(led1, led0);
+    if(ledStates == 9)
+      ledStates = configLights(led0, ledm1);
+    if(ledStates == 10)
+      ledStates = configLights(ledm1, ledm2);
+    if(ledStates > LAST_STATE) {
+      ledStates = 0;
+      delay(2*DELAY);
+    }
+  } else {
+    // turn LEDs off:
+    digitalWrite(led1, LOW);
+    digitalWrite(led2, LOW);
+    digitalWrite(led3, LOW);
+    digitalWrite(led4, LOW);
+    digitalWrite(led5, LOW);
+    digitalWrite(led6, LOW);
+    digitalWrite(led7, LOW);
+    digitalWrite(led8, LOW);
+    // I missed these three.
+    digitalWrite(led0, LOW);
+    digitalWrite(ledm1, LOW);
+    digitalWrite(ledm2, LOW);
+    ledStates = 0;
+  }
+}
+
+</code>
+</pre>
+<p>Since I did not account for 3 extra lights, the 'm' before the '1' and '2' means 'minus.' Also, I just realized that I miscounted how many lights to define in the entire program. The program assumes that there are 11 lights instead of 10.</p>
+<p>Click <a href="./Week_4_Projectino">here</a> to download the Arduino project.</p>
+<p>Back to the <a href="../index.html">main page</a>.</p>
+</body>
+
+<script src="https://strapdownjs.com/v/0.2/strapdown.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" ></script>
+
+</html>
