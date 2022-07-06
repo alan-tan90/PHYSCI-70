@@ -1,0 +1,43 @@
+Program called with the following parameters:
+ * describerTypes = "sift"
+ * extraInfoFolder = "C:/Users/N15031/Documents/GitHub/PHYSCI-70/05_3d_design_printing/assets/MeshroomCache/StructureFromMotion/824e3ece7beb7e11186fe07670ffbe460cdd01b1"
+ * featuresFolders =  = [C:/Users/N15031/Documents/GitHub/PHYSCI-70/05_3d_design_printing/assets/MeshroomCache/FeatureExtraction/3feeecf4ad05715c41446895c6777a7ab15185e5]
+ * filterTrackForks = 0
+ * initialPairA = ""
+ * initialPairB = ""
+ * input = "C:/Users/N15031/Documents/GitHub/PHYSCI-70/05_3d_design_printing/assets/MeshroomCache/CameraInit/4fc5ba235913589dc68305b68a86b4ef6e4e643b/cameraInit.sfm"
+ * interFileExtension = ".abc"
+ * localBAGraphDistance = 1
+ * localizerEstimator =  Unknown Type "enum aliceVision::robustEstimation::ERobustEstimator"
+ * localizerEstimatorError = 0
+ * localizerEstimatorMaxIterations = 4096
+ * lockAllIntrinsics = 0
+ * lockScenePreviouslyReconstructed = 0
+ * matchesFolders =  = [C:/Users/N15031/Documents/GitHub/PHYSCI-70/05_3d_design_printing/assets/MeshroomCache/FeatureMatching/8ff4152b389657857edc103927701ce651dd8cb3]
+ * maxAngleInitialPair = 40
+ * maxNumberOfMatches = 0
+ * maxReprojectionError = 4
+ * minAngleForLandmark = 2
+ * minAngleForTriangulation = 3
+ * minAngleInitialPair = 5
+ * minInputTrackLength = 2
+ * minNumberOfMatches = 0
+ * minNumberOfObservationsForTriangulation = 2
+ * observationConstraint =  Unknown Type "enum aliceVision::sfm::EFeatureConstraint"
+ * output = "C:/Users/N15031/Documents/GitHub/PHYSCI-70/05_3d_design_printing/assets/MeshroomCache/StructureFromMotion/824e3ece7beb7e11186fe07670ffbe460cdd01b1/sfm.abc"
+ * outputViewsAndPoses = "C:/Users/N15031/Documents/GitHub/PHYSCI-70/05_3d_design_printing/assets/MeshroomCache/StructureFromMotion/824e3ece7beb7e11186fe07670ffbe460cdd01b1/cameras.sfm"
+ * randomSeed = 5489 (default)
+ * useLocalBA = 1
+ * useOnlyMatchesFromInputFolder = 0
+ * useRigConstraint = 1
+ * verboseLevel = "info"
+
+Loading features
+0%   10   20   30   40   50   60   70   80   90   100%
+|----|----|----|----|----|----|----|----|----|----|
+[14:59:08.224800][error] cudaGetDeviceCount failed: CUDA driver version is insufficient for CUDA runtime version
+[14:59:08.224800][info] Can't find CUDA-Enabled GPU.
+***************************************************
+[14:59:09.308159][warning] No matches file loaded in: C:/Users\N15031\Documents\GitHub\PHYSCI-70\05_3d_design_printing\assets\MeshroomCache\FeatureMatching\8ff4152b389657857edc103927701ce651dd8cb3
+[14:59:09.330014][warning] 	- C:/Users/N15031/Documents/GitHub/PHYSCI-70/05_3d_design_printing/assets/MeshroomCache/FeatureMatching/8ff4152b389657857edc103927701ce651dd8cb3
+[14:59:09.330014][error] Unable to load matches.

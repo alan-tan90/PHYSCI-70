@@ -1,0 +1,17 @@
+{
+    "status": "NONE",
+    "execMode": "NONE",
+    "nodeName": "Meshing_1",
+    "nodeType": "Meshing",
+    "packageName": "aliceVision",
+    "packageVersion": null,
+    "graph": "",
+    "commandLine": null,
+    "env": null,
+    "startDateTime": "",
+    "endDateTime": "",
+    "elapsedTime": 0,
+    "hostname": "",
+    "sessionUid": "d26691d4-fd5c-11ec-943f-f834411c8891",
+    "elapsedTimeStr": "0:00:00"
+}

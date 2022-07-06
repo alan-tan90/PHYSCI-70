@@ -1,0 +1,84 @@
+{
+    "version": [
+        1,
+        0,
+        0
+    ],
+    "views": [
+        {
+            "viewId": 850152184,
+            "poseId": 850152184,
+            "path": "C:/Users/N15031/Documents/GitHub/PHYSCI-70/05_3d_design_printing/assets/highlighter.jpg",
+            "intrinsicId": 3109501368,
+            "metadata": {
+                "AliceVision:SensorWidthEstimation": "4.899410",
+                "AliceVision:useWhiteBalance": "1",
+                "DateTime": "2022:07:06 14:55:13",
+                "Exif:ApertureValue": "2.52",
+                "Exif:ColorSpace": "1",
+                "Exif:ComponentsConfiguration": "???",
+                "Exif:DateTimeDigitized": "2022:07:06 14:55:13",
+                "Exif:DateTimeOriginal": "2022:07:06 14:55:13",
+                "Exif:ExposureBiasValue": "0",
+                "Exif:Flash": "0",
+                "Exif:FocalLength": "4.3",
+                "Exif:FocalLengthIn35mmFilm": "26",
+                "Exif:LightSource": "0",
+                "Exif:MaxApertureValue": "1.16",
+                "Exif:OffsetTime": "-04:00",
+                "Exif:OffsetTimeOriginal": "-04:00",
+                "Exif:PhotographicSensitivity": "250",
+                "Exif:PixelXDimension": "4032",
+                "Exif:PixelYDimension": "1908",
+                "Exif:SensingMethod": "1",
+                "Exif:ShutterSpeedValue": "6.907",
+                "Exif:SubsecTime": "530329",
+                "Exif:SubsecTimeDigitized": "530329",
+                "Exif:SubsecTimeOriginal": "530329",
+                "Exif:WhiteBalance": "0",
+                "Exif:YCbCrPositioning": "1",
+                "ExposureTime": "0.0083",
+                "FNumber": "2.4",
+                "GPS:Altitude": "-nan(ind)",
+                "GPS:AltitudeRef": "0",
+                "GPS:TimeStamp": "-nan(ind), -nan(ind), -nan(ind)",
+                "ICCProfile": "0, 0, 2, 24, 0, 0, 0, 0, 2, 16, 0, 0, 109, 110, 116, 114, 82, 71, 66, 32, 88, 89, 90, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 97, 99, 115, 112, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ... [536 x uint8]",
+                "Make": "samsung",
+                "Model": "SM-G970U",
+                "Orientation": "1",
+                "ResolutionUnit": "none",
+                "Software": "G970USQU6IVE7",
+                "XResolution": "72",
+                "YResolution": "72",
+                "jpeg:subsampling": "4:2:0",
+                "oiio:ColorSpace": "sRGB"
+            }
+        }
+    ],
+    "intrinsics": [
+        {
+            "intrinsicId": 3109501368,
+            "pxInitialFocalLength": 1782.5207478995862,
+            "pxFocalLength": 1782.5207478995862,
+            "type": "radial3",
+            "width": 1908,
+            "height": 2031,
+            "sensorWidth": 4.8994100126412485,
+            "sensorHeight": 4.602695373766372,
+            "serialNumber": "C:/Users/N15031/Documents/GitHub/PHYSCI-70/05_3d_design_printing/assets_samsung_SM-G970U",
+            "principalPoint": [
+                954.0,
+                1015.5
+            ],
+            "initializationMode": "estimated",
+            "distortionParams": [
+                0.0,
+                0.0,
+                0.0
+            ],
+            "locked": false
+        }
+    ],
+    "featureFolder": "",
+    "matchingFolder": ""
+}

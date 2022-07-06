@@ -1,0 +1,18 @@
+{
+    "status": "SUCCESS",
+    "execMode": "LOCAL",
+    "nodeName": "FeatureExtraction_1",
+    "nodeType": "FeatureExtraction",
+    "packageName": "aliceVision",
+    "packageVersion": null,
+    "graph": "",
+    "commandLine": "aliceVision_featureExtraction  --input \"C:/Users/N15031/Documents/GitHub/PHYSCI-70/05_3d_design_printing/assets/MeshroomCache/CameraInit/4fc5ba235913589dc68305b68a86b4ef6e4e643b/cameraInit.sfm\" --describerTypes sift --describerPreset normal --describerQuality normal --contrastFiltering GridSort --gridFiltering True --forceCpuExtraction True --maxThreads 0 --verboseLevel info --output \"C:/Users/N15031/Documents/GitHub/PHYSCI-70/05_3d_design_printing/assets/MeshroomCache/FeatureExtraction/3feeecf4ad05715c41446895c6777a7ab15185e5\" --rangeStart 0 --rangeSize 40",
+    "env": null,
+    "startDateTime": "2022-07-06 14:57:43.155678",
+    "endDateTime": "2022-07-06 14:58:55.856439",
+    "elapsedTime": 72.70076084136963,
+    "hostname": "n15031-w101",
+    "sessionUid": "d26691d4-fd5c-11ec-943f-f834411c8891",
+    "returnCode": 0,
+    "elapsedTimeStr": "0:01:12.700761"
+}
