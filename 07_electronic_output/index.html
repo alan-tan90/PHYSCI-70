@@ -67,7 +67,7 @@
   
 <pre align="left">
 <code>
-  // Enums
+// Enums
 enum Note {Bf2, Bn2, Cn3, Cs3, Dn3, Ef3, En3, Fn3, Fs3, Gn3, Af3, An3, Bf3, Bn3, Cn4, Cs4, Dn4, Ef4, En4, Fn4, Fs4, Gn4, Af4, An4, Bf4, Bn4, Cn5, Cs5, Dn5, Ef5, En5, Fn5, Fs5, Gn5, Af5, An5, Bf5, Bn5, numNotes};
 
 // Constants
@@ -128,12 +128,12 @@ void Button::update(int &m_pState, int &m_state, int &m_toggled) {
     else
       m_pState = LOW;
   }
-  /*
+  /\*
   if(m_toggled == 2 && m_pState == HIGH) {
     m_toggled = 0;
     m_pState = LOW;
   }
-  */
+  \*/
 }
 
 // Defining Buttons
@@ -148,36 +148,36 @@ int oldDelay(ulong Time, ulong &prevTime, int interval) {
   }
 }
 
-int newDelay(ulong Time, ulong &prevTime, int interval) {
-  if(noteCode != 3) {
-    ulong timeDiff = Time - prevTime;
-    
-    //Serial.println("Time difference: ");
-    //Serial.println(timeDiff);
-    if(timeDiff >= interval) {
-      prevTime = Time;
-      //Serial.println("Pr Time: ");
-      //Serial.println(prevTime);
-      i++;
-      return 1;
-    } else {
-      return 2;
-    }
-  }
-}
+	int newDelay(ulong Time, ulong &prevTime, int interval) {
+	  if(noteCode != 3) {
+		ulong timeDiff = Time - prevTime;
+		
+		//Serial.println("Time difference: ");
+		//Serial.println(timeDiff);
+		if(timeDiff >= interval) {
+		  prevTime = Time;
+		  //Serial.println("Pr Time: ");
+		  //Serial.println(prevTime);
+		  i++;
+		  return 1;
+		} else {
+		  return 2;
+		}
+	  }
+	}
 
 // Frequency of notes
-int* generateFrequencies() {
+int\* generateFrequencies() {
   static int frequencies[numNotes] {};
   // A4 is the starting note.
   for(int i = 0; i < numNotes; i++) {
-    frequencies[i] = static_cast<int>(440 * pow(BASE, i - An4));
+    frequencies[i] = static_cast<int>(440 \* pow(BASE, i - An4));
   }
   // For the last note of the song
   frequencies[numNotes] = 1;
   return frequencies;
 }
-int* frequencies = generateFrequencies();
+int\* frequencies = generateFrequencies();
 
 // Play Note Function
 void SongNote::playNote(Note m_pitch, int m_upTime, int m_delayTime, int pin) {
