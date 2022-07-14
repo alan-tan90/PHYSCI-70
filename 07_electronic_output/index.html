@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<!DOCTYPE css>
+<html lang="en">
+
+<title>PHYSCI 70: Intro to Digital Fabrication </title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+
+<body>
+
+
+<xmp theme="united" style="display:none; align:center;" align="center">
+
+  ### Week 7: Electronic Output Devices
+  
+  This week, we were tasked to -- once again -- use Arduino to power an output device via an input device. The output devices we could use were a buzzer, a speaker, an LED that's not limited to one color, an LCD display, or a strip of LEDs. As a music fanatic, I went with a buzzer. My intent was to play part of a song and implement play and bause buttons.
+  
+  The song I chose was a song from Undertale, a video game from 2015. I picked Megalovania, one of the final boss themes. I only did the first 40 notes, however, as well as a "dead note" that acts as a delay before repeating those other notes. I can play one track of the song on a piano, albeit not with 100% accuracy.
+  
+  ### Circuit
+  
+  I was having trouble positioning the large buzzer on the breadboard. Wiring it was tough at first. Following this image below from [this tutorial](https://nathanmelenbrink.github.io/lab/output/buzzer/index.html), I wasn't sure about how to continue from there, considering that I needed a 5-volt pin. After some more struggling, I was able to get the buzzer to play two notes.
+  
+  ![Basic Buzzer Tutorial](https://nathanmelenbrink.github.io/lab/output/buzzer/buzzer_uno.png)
+  
+  This was how far I got after successfully implementing that circuit. Click [here](./assets/small_success_code.cpp) to see it. This was the circuit at the time:
+  
+  ![Circuit at the Time](./assets/broken_button.png)
+
+  I also implemented two buttons. The red button with two legs was the pause button, and that worked properly after I implemented it. However, I picked a green button that had 4 legs; even though I configured it to resume a song after it was paused, the button wouldn't work. I eventually found out that wiring a 4-legged button was different than a 2-legged button; using two of those buttons fixed my issue. The prior experience of working with buttons and other circuits from earlier weeks paid off!
+  
+  This was the final circuit:
+  
+  ![Final Circuit](./assets/final_circuit_20percent.jpg)
+  
+  ##### Technically, I used extra wires to position the buzzer outside of the breadboard so that I could more easily use them for the oscilloscope.
+
+  ### C++ Code
+  
+  I used an enumeration effectively like a macro to define integer values for each note pitch. I defined 3⅙ octaves. I also made a parallel array that "assigns" corresponding frequency values to each enumeration element, generated from a formula that I already knew:
+  ![Frequency Formula](./assets/formula.png)
+  
+  ##### "f" means frequency in hertz, while "n" means the number of half-steps above the A note with 440 hertz.
+  ##### Negative values of "n" are half-steps below that note. Drawing this on a laptop was not the best idea!
+
+  The first 40 notes of Megalovania were stored into an array, and I kept track of progress by using the variable "i." Increment this value after a note has been played, and reset its value to 0 after the song is over.
+
+  We were not permitted to use `delay()` between notes, so I needed an alternative function. This was a nightmare! Using `millis()` simply didn't work (for the most part) because either my notes would play all at once, my notes would keep playing, my notes would not play at all, or I would get other logic errors. The tutorial that worked for me came from [here](https://learn.adafruit.com/multi-tasking-the-arduino-part-1/using-millis-for-timing). One key technicality that came in an aha moment was that I couldn't use `while()` nor `for()` loops as that messes up the `Time = millis()` accumulator. So, in my `loop()` function, I needed a few conditional statements that would have to be ran, such as checking if the pause button was just pressed and if a note has waited out its designated delay time. You can see all of the code in the "Downloads" section below.
+
+  I ended up making two delay functions. `oldDelay()` was supposed to be for the delay between the end of the song and the beginning of the repeated song, but that ended up being deprecated in favor of the aforementioned "dead note." The `newDelay()` function returns a code that's basically permission to continue the song, but only if the previous note has waited its `delayTime` value.
+
+  When I got this to work, I was so excited. [Here](./assets/delay_success_code.cpp) was the code progress at the time.
+
+  I implemented one class and one struct. There is almost no difference between them; structs are public by default, and classes are private by default. I made a Note class and a Button struct. Each Note object has a pitch, an uptime value, a value to delay until the next note, a constructor method, and a function to play the note via the `tone()` function. The Button struct has values for the button pin, current state, previous state, and a progression value for when it was toggled. It also has a function to update its statuses. The value for "toggled" increments after pressing and releasing any button, and that determines whether or not to toggle the "previous state" attribute. Had I not done it this way, I could only check for if the button was _held._
+  
+  Something kind of important in C++ was me using global variables and putting "&" before function parameter names. In some programming classes, global variables are virtually tabooed (with the exception of constants), but they are kind of necessary for `setup()` and `loop()`; I don't think that either of these functions are designed to take parameter input. As for the address of operator, this allows the user to "save changes" to a variable that had been passed in through a function; omitting it would require the value to be _returned._ In C++, there are data types that you cannot literally return, such as arrays. Plus, you can only return one value at a time.
+
+  The pause button only stops the music after it was pressed, then released. Either button, after being released, resumes the song.
+
+  ### Final Result
+  
+  This was pretty fun to make in spite of the struggles. I even learned some things about C++ during this week, despite the fact that I'm also taking a C++ here at Harvard. I took a few videos of the song, but the first few had fewer notes programmed in.
+  <video width="450" height="850" controls><source src="./assets/final_video.mp4" type="video/mp4"></video>
+  
+  This was the code:
+  
+<pre align="left">
+<code>
+  // Enums
+enum Note {Bf2, Bn2, Cn3, Cs3, Dn3, Ef3, En3, Fn3, Fs3, Gn3, Af3, An3, Bf3, Bn3, Cn4, Cs4, Dn4, Ef4, En4, Fn4, Fs4, Gn4, Af4, An4, Bf4, Bn4, Cn5, Cs5, Dn5, Ef5, En5, Fn5, Fs5, Gn5, Af5, An5, Bf5, Bn5, numNotes};
+
+// Constants
+const int buzzerPin = 10;
+const double BASE = 1.05946;
+const int BASE_UPTIME = 150; 
+const int BASE_DELAY = 50;
+const int NUM_NOTES = 41;
+
+// Type defs
+typedef unsigned long ulong;
+
+// Adopted some code from this tutorial: https://learn.adafruit.com/multi-tasking-the-arduino-part-1/using-millis-for-timing
+// Using delay() would be so much more convenient!
+ulong prevTime;
+ulong Time;
+int noteCode = 1; // 1 means a note is playing while 2 means the buzzer is waiting.
+int i = 0; // Progression throughout the song
+
+
+// Classes
+class SongNote {
+public:
+  Note m_pitch; // frequencies[pitch]
+  int m_upTime; // How long this pitch is going to play
+  int m_delayTime; // Before the next note
+  SongNote(Note, int, int);
+  void playNote(Note, int, int, int);
+};
+
+SongNote::SongNote(Note pitch, int upTime, int delayTime): m_pitch(pitch), m_upTime(upTime), m_delayTime(delayTime) {
+  // Nothing needs to happen here.
+}
+
+struct Button {
+  int m_pin;
+  int m_state;
+  int m_pState;
+  int m_toggled;
+  Button(int, int, int, int);
+  void update(int&, int&, int&);
+};
+
+Button::Button(int pin, int state, int prevState, int toggled): m_pin(pin), m_state(state), m_pState(prevState), m_toggled(toggled) {
+  // Nothing needs to happen here.
+}
+
+void Button::update(int &m_pState, int &m_state, int &m_toggled) {
+  // Press button TOGGLES m_pState.
+  m_state = digitalRead(m_pin);
+  if(m_state == HIGH) {
+    m_toggled = 1;
+  }
+  if(m_state == LOW && m_toggled == 1) {
+    m_toggled = 2;
+    if(m_pState == LOW)
+      m_pState = HIGH;
+    else
+      m_pState = LOW;
+  }
+  /*
+  if(m_toggled == 2 && m_pState == HIGH) {
+    m_toggled = 0;
+    m_pState = LOW;
+  }
+  */
+}
+
+// Defining Buttons
+Button playBtn = Button(4, LOW, LOW, 0);
+Button pauseBtn = Button(2, LOW, LOW, 0);
+
+// Delay functions
+int oldDelay(ulong Time, ulong &prevTime, int interval) {
+  if(Time - prevTime >= interval) {
+    prevTime = Time;
+    return 1;
+  }
+}
+
+int newDelay(ulong Time, ulong &prevTime, int interval) {
+  if(noteCode != 3) {
+    ulong timeDiff = Time - prevTime;
+    
+    //Serial.println("Time difference: ");
+    //Serial.println(timeDiff);
+    if(timeDiff >= interval) {
+      prevTime = Time;
+      //Serial.println("Pr Time: ");
+      //Serial.println(prevTime);
+      i++;
+      return 1;
+    } else {
+      return 2;
+    }
+  }
+}
+
+// Frequency of notes
+int* generateFrequencies() {
+  static int frequencies[numNotes] {};
+  // A4 is the starting note.
+  for(int i = 0; i < numNotes; i++) {
+    frequencies[i] = static_cast<int>(440 * pow(BASE, i - An4));
+  }
+  // For the last note of the song
+  frequencies[numNotes] = 1;
+  return frequencies;
+}
+int* frequencies = generateFrequencies();
+
+// Play Note Function
+void SongNote::playNote(Note m_pitch, int m_upTime, int m_delayTime, int pin) {
+ 
+  if(noteCode == 1) {
+    tone(pin, frequencies[m_pitch], m_upTime);
+    noteCode = 2;
+  }
+}
+
+// Specify the song
+// First 10 notes: SongNote megalovania[NUM_NOTES] = {SongNote(Dn3, BASE_UPTIME, 50), SongNote(Dn3, BASE_UPTIME, 200), SongNote(Dn4, BASE_UPTIME, 400), SongNote(An3, BASE_UPTIME, 550), SongNote(Af3, BASE_UPTIME, 400), SongNote(Gn3, BASE_UPTIME, 400), SongNote(Fn3, BASE_UPTIME, 400), SongNote(Dn3, BASE_UPTIME, 200), SongNote(Fn3, BASE_UPTIME, 200), SongNote(Gn3, BASE_UPTIME, 200), SongNote(numNotes, 1, 2000)};
+SongNote megalovania[NUM_NOTES] = {SongNote(Dn3, BASE_UPTIME, 50), SongNote(Dn3, BASE_UPTIME, 200), SongNote(Dn4, BASE_UPTIME, 400), SongNote(An3, BASE_UPTIME, 550), SongNote(Af3, BASE_UPTIME, 400), SongNote(Gn3, BASE_UPTIME, 400), SongNote(Fn3, BASE_UPTIME, 400), SongNote(Dn3, BASE_UPTIME, 200), SongNote(Fn3, BASE_UPTIME, 200), SongNote(Gn3, BASE_UPTIME, 200), 
+                                  SongNote(Cn3, BASE_UPTIME, 200), SongNote(Cn3, BASE_UPTIME, 200), SongNote(Dn4, BASE_UPTIME, 400), SongNote(An3, BASE_UPTIME, 550), SongNote(Af3, BASE_UPTIME, 400), SongNote(Gn3, BASE_UPTIME, 400), SongNote(Fn3, BASE_UPTIME, 400), SongNote(Dn3, BASE_UPTIME, 200), SongNote(Fn3, BASE_UPTIME, 200), SongNote(Gn3, BASE_UPTIME, 200), 
+                                  SongNote(Bn2, BASE_UPTIME, 200), SongNote(Bn2, BASE_UPTIME, 200), SongNote(Dn4, BASE_UPTIME, 400), SongNote(An3, BASE_UPTIME, 550), SongNote(Af3, BASE_UPTIME, 400), SongNote(Gn3, BASE_UPTIME, 400), SongNote(Fn3, BASE_UPTIME, 400), SongNote(Dn3, BASE_UPTIME, 200), SongNote(Fn3, BASE_UPTIME, 200), SongNote(Gn3, BASE_UPTIME, 200),
+                                  SongNote(Bf2, BASE_UPTIME, 200), SongNote(Bf2, BASE_UPTIME, 200), SongNote(Dn4, BASE_UPTIME, 400), SongNote(An3, BASE_UPTIME, 550), SongNote(Af3, BASE_UPTIME, 400), SongNote(Gn3, BASE_UPTIME, 400), SongNote(Fn3, BASE_UPTIME, 400), SongNote(Dn3, BASE_UPTIME, 200), SongNote(Fn3, BASE_UPTIME, 200), SongNote(Gn3, BASE_UPTIME, 200), SongNote(numNotes, 1, 2000)};
+
+void setup() {
+  Time = 0;
+  prevTime = 0;
+  Serial.begin(9600);
+  
+  pinMode(buzzerPin, OUTPUT);
+  pinMode(playBtn.m_pin, INPUT);
+  pinMode(pauseBtn.m_pin, INPUT);
+}
+
+void loop() {
+  Time = millis();
+  SongNote sn = megalovania[i];
+
+  playBtn.update(playBtn.m_pState, playBtn.m_state, playBtn.m_toggled);
+  pauseBtn.update(pauseBtn.m_pState, pauseBtn.m_state, pauseBtn.m_toggled);
+  
+  if(pauseBtn.m_pState == LOW) {
+    sn.playNote(sn.m_pitch, sn.m_upTime, sn.m_delayTime, buzzerPin);
+    noteCode = newDelay(Time, prevTime, sn.m_delayTime);
+  }
+  
+  if(playBtn.m_pState == HIGH) {
+    pauseBtn.m_pState = LOW; // Force-unstick the pause botton.
+    playBtn.m_pState = LOW;
+  }
+
+  if (i == NUM_NOTES) {
+    megalovania[0].m_delayTime = 150 + 50;
+    i = 0;
+  }
+}
+</code>
+</pre>
+  <!-- Using ``` doesn't really work as the code would be aligned to the center. -->
+
+  ### Oscilloscope
+  
+  We also had to run the circuit through an oscilloscope. These were my values: (I mostly got ranges.)
+  
+  Speed: 168 to 175 kHz (when paused)
+  
+  Frequency Range: 94 kHz to 187 kHz (throughout the clip)
+  
+  Time Domain: Mine runs continuously; it doesn't drop to "< 10 Hz."
+  
+  It's a fixed clock because the "Time" value always stays at 0 seconds.
+  
+  ### Downloads
+  
+  Click [here](./button_buzzer/button_buzzer.ino) to download this week's Arduino project.
+</xmp>
+</body>
+
+<script src="https://strapdownjs.com/v/0.2/strapdown.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" ></script>
+
+</html>

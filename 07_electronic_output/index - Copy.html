@@ -1,0 +1,189 @@
+
+<!DOCTYPE html>
+<!DOCTYPE css>
+<html lang="en">
+
+<title>PHYSCI 70: Intro to Digital Fabrication </title>
+
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../style.css" rel="stylesheet">
+
+<body>
+
+
+<xmp theme="united" style="display:none; align:center;" align="center">
+
+  ### Week 7: Electronic Output Devices
+
+  We started learning about sensors and voltage dividers. For this assignment, we had to measure capacitence and other variables by using two sensors: A preexisting one and one we create. I opted to make a rotor sensor, using the rotor and Arduino code basis I had from week 3. I also used a thermistor, something I will need for my final project.
+  
+  # Thermistor
+  
+  I will need a heat sensor for my final project, so I thought this assignment would be good practice. I followed [this tutorial](https://create.arduino.cc/projecthub/Marcazzan_M/how-easy-is-it-to-use-a-thermistor-e39321) to learn how to set the circuit and project up correctly. I had to calculate temperature via this formula:
+  
+  ![Formula](./assets/temperature_formula.jpg)
+  
+  Each variable is listed in the linked tutorial. The thermistor box that I got the thermistor from only said that it was an NTC (Negative Temperature Coefficient) with a resistance of 10 kilohms. No value of B was provided, so I had to use the one that the sample code provided. I used the classroom's magnetic thermometer to measure T0, which was 73 degrees Fahrenheit (295.928 Kelvin), and I used a multimeter to measure the resistance (10,040 ohms). For some reason, putting the thermistor and the resistor in the circuit causes their resistances to increase when measuring via a multimeter. There was another resistance variable that I needed to solve for. I simply calculated the current with "regular" total voltage and resistance values and used that to determine the in-circuit thermistor's resistance.
+  <div class="row">
+  <div class="col">
+  ![My math and other diagrams](./assets/thoughtpad1.jpg)
+  My scratch work in my notebook.
+  </div>
+  <div class="col">
+  ![Thermistor Circuit](./assets/circuit.jpg)
+  
+  This is the circuit I made for the thermistor.
+  </div>
+  </div>
+  <!-- Embed google docs & google sheets data here -->
+  I then used Arduino to collect temperature samples from the classroom, and output the temperatures on my computer at lightning speed. Afterwards, I collected the data for some statistics, as shown below. I used my TI-84+ CE to generate a graph.
+  
+  <div class="row">
+    <div class="col-sm-4">
+      ![Stats on Notebook](./assets/temperature_stats.jpg) 
+      These were the minima and maxima.
+    </div>
+    <div class="col-sm-4">
+      ![Stat Editor containing the data](./assets/capture_2.png) 
+      "L3" and "L4" were the two lists I used for my data sets when graphing the data.
+	  "L3" has each temperature, and "L4" is the frequency list.
+    </div>
+    <div class="col-sm-4">
+      ![The graph of my temperature data](./assets/capture_1.png) 
+      This was the graph that my calculator generated.
+    </div>
+  </div>
+  
+  To change the temperature, I was stumped on what to do based off of the limited resources that the lab had. I decided to rub two pieces of wood together; the temperature that was detected obviously rose, but not by much. I also chose to only graph the temperature change in Fahrenheit.
+  
+  # Rotor Sensor
+  
+  A rotor sensor is basically, in my case, two spinning discs, each with part of a copper "sticker" attached to it, waiting for the two pieces of copper to align like a real capacitor. As said before, I used the motor that I had been using for the class so far, and some of the Arduino modules. I needed to laser-cut new discs (one cardboard and a few acryllic - the kerf for acryllic is so large!!!) and precisely cut a toothpick so that it would stick inside one of the holes of the spinning part of the motor. I needed the end of the toothpick to be 2 mm long, but the stick and the discs would keep falling off! The discs to latch on to the stick needed to have a 2.7-mm thick hole in their centers. Due to the kerfs being obscenely wide, I had to put masking tape on the stick to force the discs to stay in place by effectively slightly increasing the diameter.
+  
+  Here is a video of my rotor sensor in action:
+  
+  <video width="400" height="700" controls><source src="./assets/rotor_sensor.mp4" type="video/mp4"> Your browser does not support the video tag. </video>
+  
+  Once again, I used Arduino to collect data on the capacitence. The stats, minima, and maxima are all in this Google Sheet:
+  
+  <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vQXejiaWgpKL-ipptTt042-jQOcvPjGHRtItMtLubtIXCmZzbm4s2vNXMiZNfggCD0aSdheLsUfrCev/pubhtml?gid=1015451757&amp;single=true&amp;widget=true&amp;headers=false" width="600" height="900"></iframe>
+  # Code Blocks and Downloads
+</xmp>
+<!-- Code -->
+<pre align="left"><code>
+const int A1A = 3;  // define pin 3 for A-1A (PWM Speed)
+const int A1B = 4;  // define pin 4 for A-1B (direction)
+const int analog_pin = A3;
+const int tx_pin = 1;
+int read_high;
+int read_low;
+int diff;
+long result; // For tx rx
+
+void setup() {
+  pinMode(A1A, OUTPUT); // specify these pins as outputs
+  pinMode(A1B, OUTPUT);
+  pinMode(tx_pin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  
+  motorA(LOW, 150);  // turn motor CW at full speed
+  result = tx_rx();
+  Serial.println(result);
+  delay(2000);      // delay for 2 seconds
+  motorA(HIGH, 100);  // turn motor CCW at quarter speed
+  result = tx_rx();
+  Serial.println(result);
+  delay(4000);      // delay for 4 seconds 
+}
+
+/*
+  This is a custom function to drive Motor A
+  inputs: direction (HIGH/LOW), speed (0-255)
+  outputs: motor control
+ */
+void motorA(byte d, int s) {
+  if(d == 1){
+    analogWrite(A1A, 255-s); 
+    digitalWrite(A1B, HIGH); 
+  } else if (d == 0){
+    analogWrite(A1A, s); 
+    digitalWrite(A1B, LOW);
+  }
+}
+long tx_rx() {         // Function to execute rx_tx algorithm and return a value
+                      // that depends on coupling of two electrodes.
+                      // Value returned is a long integer.
+  int read_high;
+  int read_low;
+  int diff;
+  long int sum;
+  int N_samples = 100;    // Number of samples to take.  Larger number slows it down, but reduces scatter.
+
+  sum = 0;
+
+  for (int i = 0; i < N_samples; i++){
+   digitalWrite(tx_pin,HIGH);              // Step the voltage high on conductor 1.
+   read_high = analogRead(analog_pin);     // Measure response of conductor 2.
+   delayMicroseconds(100);                 // Delay to reach steady state.
+   digitalWrite(tx_pin,LOW);               // Step the voltage to zero on conductor 1.
+   read_low = analogRead(analog_pin);      // Measure response of conductor 2.
+   diff = read_high - read_low;            // desired answer is the difference between high and low.
+   sum += diff;                            // Sums up N_samples of these measurements.
+ }
+  return sum;
+}  
+</code>          
+</pre>
+<p>Code for the Thermistor Sensor:</p>
+<pre align="left"><code>
+#define RT0 10040   // Ω
+#define B 3977 
+#define VCC 5    //Supply voltage
+#define R 10400  
+
+//Variables
+float RT, VR, ln, TX, T0, VRT;
+
+void setup() {
+  Serial.begin(9600);
+  T0 = 295.928;                 //Temperature T0 from datasheet, conversion from Celsius to kelvin
+}
+
+void loop() {
+  VRT = analogRead(A5);              //Acquisition analog value of VRT
+  VRT = (5.00 / 1023.00) * VRT;      //Conversion to voltage
+  VR = VCC - VRT;
+  RT = VRT / (VR / R);               //Resistance of RT
+
+  ln = log(RT / RT0);
+  TX = (1 / ((ln / B) + (1 / T0))); //Temperature from thermistor
+
+  TX = TX - 273.15;                 //Conversion to Celsius
+
+  Serial.print("Temperature:");
+  Serial.print("\t");
+  Serial.print(TX);
+  Serial.print("C\t\t");
+  Serial.print(TX + 273.15);        //Conversion to Kelvin
+  Serial.print("K\t\t");
+  Serial.print((TX * 1.8) + 32);    //Conversion to Fahrenheit
+  Serial.println("F");
+  delay(500);
+
+}
+</code></pre>
+<!---------->
+<p>Click <a download href="./tx_rx_sensor/tx_rx_sensor.ino">here</a> to download the motor sensor Arduino project.</p>
+<p>Click <a download href="./thermistor_arduino/thermistor_arduino.ino">here</a> to download the thermistor Arduino project.</p>
+<p>Most of it came from <a href="https://create.arduino.cc/projecthub/Marcazzan_M/how-easy-is-it-to-use-a-thermistor-e39321">here</a>. I am inexperienced with using sensors in Arduino boards.
+<p>Click <a download href="./assets/temperature_log.docx">here</a> to download the dataset for the thermistor project.</p>
+<p>Back to the <a href="../index.html">main page</a>.</p>
+</body>
+
+<script src="https://strapdownjs.com/v/0.2/strapdown.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js" ></script>
+
+</html>
