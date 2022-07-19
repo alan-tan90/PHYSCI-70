@@ -1,6 +1,6 @@
 #define RT0 10040   // Ω
 #define B 3977 
-#define VCC 5    //Supply voltage
+#define VCC 5    // Supply voltage
 #define R 10400  
 
 //Variables
