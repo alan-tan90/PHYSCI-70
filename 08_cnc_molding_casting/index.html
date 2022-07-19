@@ -14,6 +14,46 @@
 
   ### Week 8: CNC, Molding, and Casting
   
+  This week's assignment is a double whammy! We needed to cut either plastic or wood (in a similar fashion to [laser cutting](../02_lasercut_fus360/index.html)) and mold/cast the object via a binding agent.
+  
+  Once again, I used the ever-so-easy-to-use Fusion 360 to create my CNC object, which is the geographical representation of my home state, Connecticut. I obtained the canvas from [this website](https://geology.com/state-map/connecticut.shtml), although I edited out the names of the major regions.
+  
+  <div class="row">
+  <div class="col">
+  ![Canvas on Fusion 360](./assets/canvas.png)
+  <p>
+  The original map without the names
+  </div>
+  <div class="col">
+  ![My recreation of the Canvas](./assets/constraints.png)
+  <p>
+  My recreation of the original map
+  </div>
+  </div>
+  <p></p>
+  
+  Making this .dxf file took about 30 minutes. I used a combination of lines and arcs to replicate the map and its rigid edges to the best of my ability. Fusion 360 tried its best to make sure that the arcs resembled circles as opposed to curved edges. Other arc tools didn't seem to work, as trying to configure the arc to get the curve I wanted required Fusion 360 to create an unwanted curve point. Some of the bottom edges of the map of Connecticut may be too curvy and thus inaccurate. There are a ton of constraints!
+  
+  Scratch that! I can't use a .dxf file on the wax cutter, monoFab! Now I have to extrude this 2D object, except I cannot do that! Why? I don't know! After about 20 minutes, I figured out that I forgot to add a line to connect two close points together. I did so, and the object fully closed itself. A new problem arose: The map technically had two separate closed objects, so it created two bodies. Somehow, I wasn't able to extrude one object so that it was on the same body as the other. My solution to this was to create a new component, which still made two bodies. When exporting it as an .stl file, I was able to hold `Shift` and select both objects to export them together as one file. 
+  
+  The 3D model of the object will be placed right here:
+  
+  ![3D Model of Connecticut](./assets/3d_model.jpg)
+  
+  ##### The extrusion is 0.55 centimeters in depth.
+  
+  The next day at the lab, I was pleased to witness the success of my wax cut! However, there were some edges that needed to be cleaned as if they were gutters; I resolved that with an exact-o-knife, although I had to make sure that I didn't ruin the design of the wax cut. See Connecticut in all its glory:
+  
+  ![Connecticut Map on Wax](./assets/wax_cut.png)
+  
+  All I needed to do was to apply the binding agents! I used silicone rubber, a mixture of equal parts of two substances that literally had "Part A" and "Part B" in their names. Both parts were difficult to extract from their containers via tongue depressors; I would only get a little glob in the cup at a time, and I would have to frequently clean the cup's walls to salvage what little non-Newtonian fluids were left. I realized that I made too much, thinking that 90 mL of the solution was barely enough. Was I supposed to cover the *entire* chunk of wax in this binding agent? I saw someone else's project, and they did the same thing I did (besides the CNC cuts), so I think I'm fine. Here's the image of the binding agent being poured over the previous image:
+  
+  ![Connecticut Map Covered with Silicone](./assets/silicone_spill.jpg)
+  
+  # Downloads
+  Click [here](./assets/Alan_CT.dxf) to download this week's .dxf file.
+  Click [here](./assets/Alan_CT.stl) to download this week's .stl file.
+  
   Back to the [main page](../index.html).
 </xmp>
 </body>
