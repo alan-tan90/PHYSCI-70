@@ -37,7 +37,7 @@ void setup() {
 }
 
 // This was called many times.
-// This function takes in an LED to turn off, and the next LED to turn on. It prints a bunch of debug text, and increments the ledStates variable,
+// This function takes in an LED to turn off and the next LED to turn on. It prints a bunch of debug text, and increments the ledStates variable,
 // giving permission for the next light to be passed through this function.
 int configLights(int ledoff, int ledon) {
   Serial.print("State ");
