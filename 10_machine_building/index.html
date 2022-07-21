@@ -10,91 +10,13 @@
 <body>
 
 
-<xmp theme="united" style="display:none; align:center;" align="center">
+<xmp theme="cerulean" style="display:none; align:center;" align="center">
 
-  ### Week 9: Radio, Wi-Fi, & Bluetooth (IoT)
+  ### Week 10: Machine Building
   
-  This week, we started using our ESP32 boards to interact with the Internet or a Local Area Network (LAN). All we needed to do was retreive data online and have the ESP32 respond to it in some way. There were multiple ways to complete this assignment; one of them was via Bluetooth!
-  
-  # Original Ideas
-  
-  I wanted to use Firebase and set up a full-fletched server, but I could not do it with any of my email accounts because I needed an Administrator account. Personal emails did work according to another classmate; by the time I received the steps to set Firebase up with such an email, I already scrapped that idea.
-  
-  Afterwards, I shifted my focus to [Pokémon Showdown's website](https://play.pokemonshowdown.com/). Looking at the tutorial that involves weather data, I thought I could replicate it but instead utilize the values of "Users Online" and "Active Battles" on a breadboard, but I found out that the site's `.html` file doesn't have such values. A JavaScript script is ran about 10 seconds after the website initially loads, and the aforementioned values changed. I don't think it's possible to forcibly run one of those scripts from the website and return the desired values.
-  
-  I did a rough "sketch" of what I was going to do before I scrapped this idea:
-  
-  ![Rough Sketch of Old Idea](./assets/Plan_A.jpg)
-  
-  # New Idea
-  
-  I stuck with Pokémon Showdown, but I changed the website to [this one](https://pokemonshowdown.com/ladder/gen4randombattle.json) since it had raw data that I could iterate over. I wasn't sure which pieces of data to extract, but I picked usernames and ELOs for the top 10 players. If I had more time, then I would take more data from that file. In retrospect, those 10 players would likely not have their ELOs nor placements change quickly because of various reasons (mainly their activity on the website).
-  
-  # Development
-  
-  This was full of struggling! After scrapping the very first idea, I was originally going to make LEDs light based off changes in active players and battles. I first followed [this tutorial](https://nathanmelenbrink.github.io/lab/networking/huzzah2.html), but upon hitting the JavaScript script roadblock, I ported over code from [this other tutorial](https://techtutorialsx.com/2018/09/13/esp32-arduino-web-server-receiving-data-from-javascript-websocket-client/). Also, I had to install so many libraries because I wasn't sure which ones to install; until I installed the right one, I would keep getting compiler errors saying that a specific library wasn't found. I only realized that some libraries were intended for the older ESP8266 boards.
-  
-  ![Installed Libraries](./assets/libraries_included.png)
-  
-  The next big hurdle was that the 2nd tutorial was supposed to let me connect to an IP address online to view [this](./sketch_jul20b/data/ws.html) `.html` file. Even after following the tutorial verbatim (minus changes to the Wi-Fi credentials and IP address), I would keep getting ambiguous 500 errors. I couldn't even access "/html", for some reason. Here was the Chrome error: (This also happened in Microsoft Edge.)
-
-  ![HTTP 500 Error](./assets/error.png)
-
-  I eventually found out a workaround, although it isn't really elegant. The only way I could get this setup to work at all was to directly load the `.html` file from my computer. This userface worked as intended until I tried to figure out how to run a JavaScript script from the Showdown website:
-
-  ![Working Screenshot](./assets/screenshot.png)
-  
-  
-  This was around the time where I had to scrap it entirely and use a different webpage from Pokémon Showdown to retreive data from. I have the code for the main project at the final Arduino download link of this webpage. At first, nothing would show up every time I ran the payload. I think it's because this subset of C++ doesn't really like string concatenation with the `+` operator, especially with `Serial.println()`. After some code tinkering, I was able to get a favorable output, which you can see [here](./assets/successful_output.log).
-  
-  The hard part was surprisingly collecting the data. I didn't realize early enough that the data that the `.json` file had wasn't exactly in a C++ friendly format, so I decided to make a struct and assign parts of the data to it via this code:
-  
-  <pre align="left"><code>
-  ShowdownPlayer* modifyPayload(String &str) {
-  
-  // This marks the "new start" of the "file".
-  size_t index = str.indexOf("[") + 1;
-  size_t newIndex = index;
-  // Make an array for player classes. I would do more than 10, but I need to conserve RAM. I'll stick to usernames and ELO rankings.
-  // I assigned it this way to prevent an error. All of this has to be overwritten, anyway.
-  ShowdownPlayer players[10] = {ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null")};
-  for(int i = 0; i < 10; i++) {
-    index = str.indexOf("\"username\":", index) + 12;
-    newIndex = str.indexOf(',', index);
-    String username = str.substring(index, newIndex);
-    index = str.indexOf("\"elo\":", index) + 6;
-    newIndex = str.indexOf('}', index);
-    String ELO = str.substring(index, newIndex);
-    players[i] = ShowdownPlayer(username, ELO);
-  }
-
-  return players;
-}
-  </code></pre>
-  
-  I am still a novice at using pointers in C++, so I have spent at least an hour unsuccessfully trying to display the data in Serial. I would keep getting compiler or runtime errors. The compiler errors were mostly me using the pointer syntax wrong and thus causing data type conflicts, while the runtime errors keep restarting the ESP32. The compiler errors were easy to fix with some trial and error, but the runtime errors were persistent:
-  
-  <div class="row">
-  <div class="col">
-  ![Runtime Error 1](./assets/guru_runtime_error.png)
-  <p>
-  </div>
-  <div class="col">
-  ![Runtime Error 2](./assets/other_runtime_error.png)
-  </div>
-  </div>
-  
-  # Final Result
-  
-  At this point, I started to run out of time, so I'll leave the week at this successful output:
-  
-  ![Final output showing ELOs and usernames for the top 10 players of the Gen 4 Random Battle format.](./assets/Serial_WAI.png)
-  
-  Technically, this data would change slowly, as such players aren't always actively battling each other. As soon as at least one of them plays a match, then the data would change, and the ESP32 would display different values. If I was clever enough to pick some players that had lower ELO values, then watching the data change in real time would be more entertaining.
+  This week, 
   
   # Downloads
-  There are plenty of Arduino projects. Two of them were direct rips from tutorials because I was struggling to incorporate both of them into this week's assignment. The final result had one of them as a basis, but I modified it significantly. The other Arduino project was a backup that had code from both tutorials; it was a scrapped attempt at one of my previous ideas.
-  
   Click [here](./sketch_jul20b/sketch_jul20b.ino) to download the tutorial project for Web Socket HTML/JS file reading.
   
   Click [here](./sketch_jul20c/sketch_jul20c.ino) to download the tutorial project for reading Weather data.
@@ -103,114 +25,7 @@
   
   Click [here](./arduino_assignment/arduino_assignment.ino) to download my final build of my Arduino project for this week.
   
-  # Code 
   
-  Final Assignment code: (It's really long!)
-  
-  <pre align="left"><code>
-  // Skeleton code came from https://nathanmelenbrink.github.io/lab/networking/huzzah2.html.
-#pragma once
-#include <WiFi.h>
-#include <HTTPClient.h>
-// This include comes from the tutorial link at the very bottom.
-#include <SPIFFS.h>
-// I can't include this one without downloading from here:
-// https://github.com/me-no-dev/ESPAsyncWebServer, https://github.com/me-no-dev/ESPAsyncTCP
-#include <AsyncTCP.h>
-#include <ESPAsyncWebServer.h>
-
-struct ShowdownPlayer {
-  String m_username;
-  String m_elo;
-  ShowdownPlayer(String, String);
-};
-
-ShowdownPlayer::ShowdownPlayer(String username, String elo): m_username(username), m_elo(elo) {
-  
-}
-
-// Define the SSID & Password (Removing "const" fixed an error.)
-char* network = "MAKERSPACE";
-char* password = "12345678";
-const String website = "https://pokemonshowdown.com/ladder/gen4randombattle.json";
-
-// Make an array for player classes. I would do more than 10, but I need to conserve RAM. I'll stick to usernames and ELO rankings.
-// I assigned it this way to prevent an error. All of this has to be overwritten, anyway.
-ShowdownPlayer players[10] = {ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null"), ShowdownPlayer("null", "null")};
-  
-
-void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(115200);
- 
-  // I was mixing code from 2 tutorials. AHHHHHHH!
-  
-  WiFi.begin(network, password);
-  while (WiFi.status() != WL_CONNECTED) {
-    delay(1000);
-    Serial.println("Connecting to WiFi...");
-  }
-  Serial.println(WiFi.localIP());
-  // Sets up events and handlers after beginning the Wi-Fi session.
-  Serial.println("Connected to the WiFi network.");
-
-}
-
-// This was originally going to modify the payload, but I ended up realizing that I should just make a new Player class array that has "cleaned" up data.
-void modifyPayload(String &str, ShowdownPlayer* showdownPlayers) {
-  
-  // This marks the "new start" of the "file".
-  size_t index = str.indexOf("[") + 1;
-  size_t newIndex = index;
-  int j = 0;
-  for(ShowdownPlayer *i = showdownPlayers; j < 10; *i++) {
-    index = str.indexOf("\"username\":", index) + 12;
-    newIndex = str.indexOf(',', index);
-    String username = str.substring(index, newIndex - 1);
-    index = str.indexOf("\"elo\":", index) + 6;
-    newIndex = str.indexOf('}', index);
-    String ELO = str.substring(index, newIndex);
-    *i = ShowdownPlayer(username, ELO);
-    j++;
-  }
-  
-}
-
-void loop() {
-  
-  // put your main code here, to run repeatedly:
-  if(WiFi.status() == WL_CONNECTED) {
-    HTTPClient http;
-    http.begin(website);
-    
-    int httpCode = http.GET();
-    if (httpCode > 0) {
-      delay(4000);
-      
-      String payload = http.getString();
-      
-      ShowdownPlayer* showdownPlayers = players; 
-      modifyPayload(payload, showdownPlayers);
-      
-      for(int i = 0; i < 10; i++) {
-        Serial.print("\n");
-        Serial.print(players[i].m_username);
-        Serial.print(" has an ELO of ");
-        Serial.print(players[i].m_elo);
-      }
-      Serial.println("\n--------------- END OF DATA ---------------");
-    } else {
-      Serial.println("Error.");
-    }
-    http.end();
-  }
-  // Random Nerd Tutorials don't have a section for extracting data from a web site's JAVASCRIPT files. I looked at this tutorial:
-  // I ended up using a ".json" file from Pokemon Showdown. This can change dynamically.
-  // https://techtutorialsx.com/2018/09/13/esp32-arduino-web-server-receiving-data-from-javascript-websocket-client/
-  delay(1000);
-  
-}
-</code></pre>
   
   Back to the [main page](../index.html).
 </xmp>
