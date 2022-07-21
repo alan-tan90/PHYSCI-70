@@ -108,6 +108,7 @@
   Final Assignment code: (It's really long!)
   
   <pre align="left"><code>
+  #define REDACTED "REDACTED"; // I hid the SSID and the password from public view.
   // Skeleton code came from https://nathanmelenbrink.github.io/lab/networking/huzzah2.html.
 #pragma once
 #include &lt;WiFi.h&gt;
@@ -130,8 +131,8 @@ ShowdownPlayer::ShowdownPlayer(String username, String elo): m_username(username
 }
 
 // Define the SSID & Password (Removing "const" fixed an error.)
-char* network = "MAKERSPACE";
-char* password = "12345678";
+char* network = REDACTED;
+char* password = REDACTED;
 const String website = "https://pokemonshowdown.com/ladder/gen4randombattle.json";
 
 // Make an array for player classes. I would do more than 10, but I need to conserve RAM. I'll stick to usernames and ELO rankings.
