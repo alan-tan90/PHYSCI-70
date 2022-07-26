@@ -14,18 +14,124 @@
 
   ### Week 10: Machine Building
   
-  This week, 
+  This week, we were tasked to use a special Stepper Motor to make a machine. This week was almost like [Week 3](../03_kinetic_sculpture/index.html) in the sense that we had to make something move with a motor. I didn't have a good idea for what machine to make with a single stepper motor, and I was having so much trouble getting the motor to even run. Thus, I stuck with making a wheel spin randomly as if it was for the game show, Wheel of Fortune.
   
-  # Downloads
-  Click [here](./sketch_jul20b/sketch_jul20b.ino) to download the tutorial project for Web Socket HTML/JS file reading.
+  # Wiring
   
-  Click [here](./sketch_jul20c/sketch_jul20c.ino) to download the tutorial project for reading Weather data.
+  The Stepper Motor has its own circuit board that has a power pin, 2 ground pins, and other pins for motors. I was attempting to reproduce the circuit that [this website](https://www.pololu.com/product/2876#lightbox-picture0J9750) provided, but I ran into a road block: I needed multiple batteries.
   
-  Click [here](./assets/old_arduino_assignment.ino) to download a backup of my Arduino project. It had code from 2 different tutorials.
+  ![Ideal Step Motor Circuit](https://a.pololu-files.com/picture/0J9750.850.jpg?018aeb688feed9c63fc87c5f22f17805)
   
-  Click [here](./arduino_assignment/arduino_assignment.ino) to download my final build of my Arduino project for this week.
+  Multiple people suggested (and I wasn't aware of this) that I directly plug the pins into the breadboard, which was a very smart idea. I did have to write down (and pseudo-memorize) which breadboard coordinate corresponded to which board pin, and I had been anxious about whether or not I mixed up which side was which. I also found out that I only needed Arduino to power up everything; however, I then couldn't fit a 100-microfarad capacitor because the Motor's VCC and Ground pins were on adjacent rows. 
   
+  Another issue I ran into was that the wires that connected to the motor were faulty: it looked like there were multiple ultra-thin wires within each insulator. Twisting them together was futile; I had to solder an extra small wire on top of each faulty wire.
   
+  ![Me attempting to solder the wires](./assets/soldering_station.jpg)
+  
+  It still took me no more than one hour to troubleshoot the motor as it still refused to spin after compiling and exporting Arduino code continuously. I had to keep changing the order of the motor wires and applying electrical tape so that the wires keep conducting electricity. Here was the basic circuit:
+  
+  ![Basic Circuit Design](./assets/beta_design.jpg)
+  
+  I finally got the motor working, and I recorded out of excitement:
+  
+  <video width="500" height="885" controls><source src="./assets/motor_spin.mp4" type="video/mp4">Your browser does not support the &lt;video&rt; tag.</video>
+  
+  # Ideas 
+  
+  What do I do with this? I decided to further explore the capabilities of the Accel. Motor library by using [this tutorial](https://nathanmelenbrink.github.io/lab/machine/steppers.html). I played around with editing the step, acceleration, and max speed values. I eventually found out how to make it move in cardinal directions (90-degree intervals), and this sample code shows just that:
+  <pre align="left"><code>
+	\#include &lt;AccelStepper.h>
+	const int stepPin = 11;  
+	const int dirPin = 12;   
+	int x;
+	const int rotationConstant = 52;
+	AccelStepper stepper(1, stepPin, dirPin); 
+	void setup()
+	{
+	  x = 0;
+	  // Calibrate the thing
+	  if(stepper.distanceToGo() == 0)
+	  {
+		stepper.moveTo(x);
+	  }
+	  stepper.run();
+	  delay(1500);
+	  Serial.begin(9600);
+	  Serial.println("Stepper Calibrated!");
+	}
+	void loop()
+	{
+	  if (stepper.distanceToGo() == 0)
+	  {
+		x += rotationConstant - (rotationConstant \* 4) \* (x > (rotationConstant * 2));
+		Serial.println("The Stepper is moving, and x = ");
+		Serial.print(x);
+		Serial.print(".\n");
+		delay(1000);
+		stepper.moveTo(x);
+		stepper.setMaxSpeed(900);
+		stepper.setAcceleration(300);
+	  }
+	  stepper.run();
+	}</code>
+</pre>
+
+  I was thinking of modifying this code so that a machine moves to a random cardinal direction and throws a hammer as if the machine was playing Whack-a-mole, but I had to abandon that thought because I only had one motor; even if I had a second one, its weight would exceed the carrying capacity of everything else that I would have had. Thus, I decided to make a wheel spin and land in a random location. The motor would spin randomly until it rotated 10 times.
+  
+  Here is a demo for what a Whack-a-mole machine could have been:
+  
+  <video width="500" height="885" controls><source src="./assets/cardinals.mp4" type="video/mp4">Your browser does not support the &lt;video&rt; tag.</video>
+  
+  # Final Result
+  
+  One funny mistake I made was that, when laser-cutting the wheel, I thought I had enough space on the scrap piece of cardboard to cut a full circle, but I made an estimation error as to how big of a wheel I needed, so part of the circle got trimmed off, which is kind of funny. Here is the video of the machine working:
+  
+  As a side note, I used my Week 3 project's stand and attached a little tip to represent a point to whatever wheel segment the wheel stopped at.
+  
+  <video width="500" height="885" controls><source src="./assets/footage.mp4" type="video/mp4">Your browser does not support the &lt;video&rt; tag.</video>
+  
+  This is the final code:
+  <pre align="left"><code>
+	\#include &lt;AccelStepper.h>
+	const int stepPin = 11;  // blue
+	const int dirPin = 12;   // orange n
+	const int NUM_ROTATIONS = 10;
+	int x, i;
+	// Originally used for testing: const int rotationConstant = 52;
+	// Define a stepper and the pins it will use
+	AccelStepper stepper(1, stepPin, dirPin); // initialise accelstepper for a two wire board
+	void setup()
+	{
+	  x = 0;
+	  i = 0;
+	  // Calibrate the thing.
+	  if(stepper.distanceToGo() == 0)
+	  {
+		stepper.moveTo(x);
+	  }
+	  stepper.run();
+	  delay(1500);
+	  Serial.begin(9600);
+	  Serial.println("Stepper Calibrated!");
+	}
+	void loop()
+	{
+	  if(i < NUM_ROTATIONS) {
+		Serial.print("\nThe Stepper is moving, & i is ");
+		Serial.print(i);
+		Serial.print(".\n");
+		if (stepper.distanceToGo() == 0)
+		{
+		  delay(1000);
+		  i++;
+		  stepper.moveTo(1000 - (rand() % 1000) * (i == 9));
+		  stepper.setMaxSpeed(1000);
+		  stepper.setAcceleration(999);
+		}
+		stepper.run();
+	  }
+	}
+</code></pre>
   
   Back to the [main page](../index.html).
 </xmp>
