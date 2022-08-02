@@ -7,16 +7,291 @@
 <link href="../style.css" rel="stylesheet">
 <body>
 <xmp theme="cyborg" style="display:none">
-Progress:
+## Progress (At a Glance):
 <ul align="left">
 <li>Made rectangle sketch for the handle on Fusion 360.
 <li>Made sketch for the blade on Fusion 360.
 <li>Created the extrusions.
-<li>
+<li>Created a triangular prism pattern on the blade of the knife.
+<li>Made cuts to the knife based on that pattern.
+<li>Added a cylinder hole through the middle of the knife.
+<li>Saved an <code>.stl</code> file of the knife.
+<li>3D Printed the knife with several failures and one success.
+<li>Found a basis for the Web server that I can use to control the thermistor/thermocouple.
+<li>Edited the Sketch on Prusa's Lab Application.
+<li>Obtained a thermocouple and a heating element.
+<li>Soldered wires onto the heating element to connect to the ESP32.
+<li>Wired up the thermocouple to fit into the knife handle's hole.
+<li>Laser-cut acryllic to close up the knife handle.
+<li>Added code to interact with the heating element.
+<li>Updated the HTML code.
+<li>Noticed inconsistencies with temperature readings.
+<li>Noticed that only 0.38 volts were allocated for the heating element when the <code>isHeating</code> Boolean is true.
+<li>Replaced the thermocouple with a thermistor, and added corresponding Arduino code.
+<li>Resoldered the heating element's wires, and soldered wires onto the thermistor.
+<li>Noticed the reasons for the temperature inconsistencies.
+<li>Recorded the video to wrap up whatever I had.
 </ul>
 
-[Go back](../index.html)
+## Progress (Detailed):
+
+The first step was to make the knife. I had to carefully think of the dimensions that I wanted to use, considering how one would grip this thing to cut food with it. The handle was abnormally volumous because I thought I would fit wires and circuits in it. The dimensions I selected were 11.5 cm x 2.8 cm x 2 cm. Ordinary knife handles are as thin as Hershey's chocolate bars. As for the blade, I made it as thin as an ordinary knife's blade, with it being 8.5 cm long, 6 mm thick, and 1.5 cm high. The tool I used was Fusion 360. To connect the knife blade and the handle, I made the mistake of using a loft to connect the two, as it made cutting food with the knife less practical. I should have put the blade's bottom parallel on the same plane as the handle's bottom; I didn't go that route because I thought it would compromise the user's ability to hold the thick knife. It took me a while to make a pattern of triangular prisms to "cut" into the knife's blade as merging objects in Fusion 360 for the sake of intersection was not intuitive, especially when doing so with 51 objects at once. The blade wasn't sharp enough...
+
+<iframe src="https://branfordschools3.autodesk360.com/shares/public/SH9285eQTcf875d3c53914d453cd86c9b856?mode=embed" width="640" height="480" allowfullscreen="true" webkitallowfullscreen="true" mozallowfullscreen="true"  frameborder="0"></iframe>
+
+Another change I should have made was implement a press-fit somewhere on the handle so that I could have 3D printed a top to the handle to allow for easier opening and closing of the top. That would have saved so much tape...
+
+3D printing the knife was really difficult. Since I wanted the knife to look gray, I picked the transparent (not even knowing that it was actually transparent) PETG filament instead of the conventional PLA filament. A classmate, who is an expert in 3D printing, pointed out that it's way harder to print something with PETG filaments, hence the following failures. Additionally, in the Prusa application, I had to shrink the whole object by 10% just to make sure that everything fit nicely. Each print took up to 4 hours after accounting for supports and a brim layer. Here were some failures:
+
+<div class="row">
+    <div class="col">
+      ![Failure 1](./assets/failed_print_1.jpg) 
+    </div>
+    <div class="col">
+      ![Failure 2](./assets/failed_print_2.jpg) 
+    </div>
+</div>
+<div class="row">	
+    <div class="col">
+      <video width="500" height="925" controls><source src="https://drive.google.com/file/d/1z0pAjQasky6nle-aczjavYDGcgRamgdC/view?usp=sharing" type="video/mp4"></video> 
+    </div>
+	<div class="col">
+      <video width="500" height="925" controls><source src="https://drive.google.com/file/d/1IsgGjOwfxBNwn9RrEi8GS6vSps5tGlfW/view?usp=sharing" type="video/mp4"></video>
+    </div>
+</div>
+
+Prusa had separate `.gcode`s for PLA and PETG prints, so I had [multiple](./assets/KNIFE_REBORN.gcode) [attempts](./assets/KnifeReborn.gcode) [saved](./assets/Alan_KNIFE.gcode). I also ended up having one of the teacher assistants print the knife successfully for me; some of us hypothesized that -- after I perfected my `.gcode` file ([this one](./assets/Alan_Knife_0.1mm_PLA_MK3S_3h57m.gcode)) -- the 3D printer had issues with calibrating the needle on the Z-Axis.
+This was the result:
+
+![The 3D-printed knife base](./assets/final_print.jpg)
+
+I worked with this. Afterwards, I attached a heating element to the knife. Ideally, I would have cut it so that the size would be tailored to the knife's dimensions, but I thought doing so would mess up the functionality of the heating element itself. I also preferred using one that the lab had.
+In hindsight, I should have struggled with the PETG filament because that was more heat-resistant, and I wouldn't have to cap the max temperature at 50 degrees Centigrade.
+
+![Knife with heating element](./assets/heating_elem_attached.png)
+
+Due to time constraints, I secured everything with tape. I also wanted everything to be deconstructed easily. The next step was to fit in the thermocouple and laser cut a top to the knife's handle. Those will all be visible in the video demonstration.
+
+The next task was to implement the programming. The previous web server tutorials I followed didn't work because I would constantly (See [Week 9](../09_radio_wi-fi/index.html) for more information.) have my connection reset or output a 500 error. (All the tutorials are linked in the final project Arduino code.) I eventually found a web server and its API that I could use. I also reused code from my previous assignments, as well as looked at a new tutorial for wiring/reading temperature from thermocouples. I first tested the thermocouple's temperature-reading capabilities, and everything worked at first: the temperatures would output 24-25 degrees Centigrade consistently.
+
+![Normal Temperatures](./assets/normal_temperatures.png)
+
+I also saved code from using other HTML server libraries. Here is [one file](./assets/old_http_code.cpp). Needless to say, I ditched it in favor of a Web Server. 
+
+I noticed some odd quirks, however. I noticed that the temperature would sometimes read 0 degrees or "nan" (Not a Number) degrees. At first, I thought it was because reading the voltage via the multimeter interrupts the calculations for temperature. That, however, was the least of my worries. For the vast majority of my lab periods, the knife WOULDN'T WORK as intended! Only once did the knife heat up at my command along with the temperatures updating.
+
+![Small Success with Temperature readings](./assets/somewhat_of_a_success.png)
+
+I've never seen that error before. Somehow, I made it so that the ESP32's system voltage fell below an acceptable threshold, causing an automatic restart. There was only one instance where that happened, however. Later on, the issues I got were worse.
+
+One of the key problems I had in this project was that the heating element simply wouldn't heat up, even if I activated the button. I checked: The mechanisms to allow powering the heating element worked as intended; nothing was wrong in the code nor the circuit -- except one major detail: FOR SOME REASON, only _0.38_ volts were being supplied to the heating element. Why was that? The reasons:
+
+<ol align="left">
+<li>The thermocouple's circuit had a voltage drop too large.
+<li>I was powering from a (faulty) ESP32 pin as opposed to a 5V/3.3V pin.
+<li>Faulty wiring
+<li>New soldering required
+</ol>
+
+In addition, this was the moment that I realized that all of my circuitry had to be outside the knife due to the sheer amount of it and the fact that I needed a breadboard. The first reason prompted me to get a thermistor, solder new wires on it, and reproduce my Week 6 circuit; I wasn't fond of this idea because I thought I'd have to redo my code, and it would be harder to position it to the heating element, unlike the thermocouple. Even if I did not implement a temperature sensor to the circuit, the ESP32 pin still provided only 0.38 volts maximum to the heating element. I kept adjusting my circuit's wires, but many of the socket-socket wires wouldn't keep a wire in. Also, sticking wires into the depths of the breadboard wasn't always easy; since wires are malleable, I usually get them halfway before they start bending in an unfavorable direction.
+The last option was pretty much the culprit; I didn't realize that the reason for the low power was due to me soldering the wires to the heating element incorrectly; I did it a 2nd time, and I think I still did it wrong. Lastly, changing ESP32 pins and even using the Arduino Metro to power the heating element via a pin (except the 3.3V or 5V) resulted in the same problem.
+
+At this point, I was on the brink of giving up. One epiphany that I had was using the Arduino Metro to receive the low-voltage output, put it in its VIN pin, and self-regulate the voltage so that the output was 5 volts. That strategy didn't work. I had to start recording the demo video, so I did so on an empty desk since the preset recording environment was already in use.
+
+If transformers or relays were available, I could have fully made use of them to adjust the low voltage (and fix the low voltage problem) to 3.3 volts or more. The ESP32 could have also controlled a battery pack that contained a 3-volt Lithium ion battery, but the concept of adding a thermistor would throw a wrench in that idea.
+
+## Demonstration Video
+
+<video width="900" height="600" controls><source src="./assets/demo_video.mp4" type="video/mp4"></video>
+
+## Final Arduino Code
 </xmp>
+<pre align="left"><code>
+#pragma once
+#include &lt;WiFi.h>
+#include &lt;HTTPClient.h>
+#include &lt;WebServer.h>
+#include "max6675.h"
+typedef MAX6675 thermocouple;
+
+// PINs
+const int thermo_SO = 19;
+const int thermo_CS = 23;
+const int thermo_SCK = 5;
+const int HEATING_PIN = 17;
+const int ANALOG_PIN = 32;
+
+// Login credentials
+const char* ssid = REDACTED;
+const char* password = REDACTED;
+
+// THERMISTOR Constants
+#define RT0_temp 10040
+#define B 3977 
+#define VCC 5
+#define R 10400
+float RT, VR, ln, TX_temp, T0_temp, VRT;
+
+// Other global variables
+thermocouple th(thermo_SCK, thermo_CS, thermo_SO);
+bool isHeating = false;
+const double MAX_TEMPERATURE = 55; // Degs C
+double currentTemperature = 0.0; // Degs C
+WebServer server(80);
+
+// In case there are Error 500s
+IPAddress local_IP(192, 168, 0, 230);
+IPAddress gateway(192, 168, 0, 1);
+IPAddress subnet_mask(255, 255, 255, 0);
+IPAddress dns(8, 8, 8, 8);
+
+// WiFiServer server(80);
+// Skeleton code came from this tutorial: https://lastminuteengineers.com/creating-esp32-web-server-arduino-ide/
+// ESP32-Thermocouple tutorial: https://randomnerdtutorials.com/esp32-k-type-thermocouple-max6675/
+// Thermistor tutorial: https://create.arduino.cc/projecthub/Marcazzan_M/how-easy-is-it-to-use-a-thermistor-e39321
+
+// Function prototype
+String SendHTML(bool boole, double temp = -2);
+
+// Defaults to false for isHeating.
+void handle_OnConnect() {
+  isHeating = false;
+  Serial.println("Connected.");
+  server.send(200, "text/html", SendHTML(isHeating, currentTemperature)); 
+}
+
+// Lets the heater turn on.
+void enable_heating() {
+  isHeating = true;
+  Serial.println("The knife will start heating.");
+  server.send(200, "text/html", SendHTML(isHeating, currentTemperature)); 
+}
+
+// Lets the heater turn off.
+void disable_heating() {
+  isHeating = false;
+  Serial.println("The knife will stop heating.");
+  server.send(200, "text/html", SendHTML(isHeating, currentTemperature)); 
+}
+
+// In case there's a 404 error.
+void handle_NotFound() {
+  server.send(404, "text/plain", "Not found");
+}
+
+// Reused code from Week 6. 
+float checkTempWithThermistor() {
+  VRT = analogRead(ANALOG_PIN);
+  VRT = (5.00 / 1023.00) * VRT;
+  VR = VCC - VRT;
+  RT = VRT / (VR / R);
+
+  ln = log(RT / RT0_temp);
+  TX_temp = (1 / ((ln / B) + (1 / T0_temp)));
+
+  TX_temp -= 273.15;
+  // return TX_temp;
+}
+
+// Injects HTML to a web server that updates the statuses of the temperatures and the isHeating Boolean.
+String SendHTML(bool boole, double temp) {
+  String ptr = "&lt;!DOCTYPE html> &lt;html>\n";
+  ptr +="&lt;head>&lt;meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0, user-scalable=no\" charset=\"UTF-8\">\n";
+  ptr +="&lt;title>Thermistor Control Panel&lt;/title>\n";
+  ptr +="&lt;style>html { font-family: Helvetica; display: inline-block; margin: 0px auto; text-align: center;}\n";
+  ptr +="body{margin-top: 50px;} h1 {color: #444444;margin: 50px auto 30px;} h3 {color: #444444;margin-bottom: 50px;}\n";
+  ptr +=".button {display: block;width: 98px;background-color: #ff8365;border: none;color: white;padding: 13px 30px;text-decoration: none;font-size: 25px;margin: 0px auto 35px;cursor: pointer;border-radius: 35px;}\n";
+  ptr +=".button-on {background-color: #ff8365;}\n";
+  ptr +=".button-on:active {background-color: #ff601e;}\n";
+  ptr +=".button-off {background-color: #34495e;}\n";
+  ptr +=".button-off:active {background-color: #2c3e50;}\n";
+  ptr +="p {font-size: 14px;color: #888;margin-bottom: 10px;}\n";
+  ptr +="&lt;/style>\n";
+  ptr +="&lt;/head>\n";
+  ptr +="&lt;body>\n";
+  ptr +="&lt;h1>The Food-Heating Knife&lt;/h1>\n";
+  ptr +="&lt;h3>Click to Enable/Disable&lt;/h3>\n";
+  
+  if(boole) {
+    ptr +="&lt;p>The knife is heating.&lt;/p>&lt;a class=\"button button-off\" href=\"/enable_heating\">ENABLE&lt;/a>\n";
+    ptr +="&lt;p>&lt;/p>&lt;a class=\"button button-off\" href=\"/disable_heating\">DISABLE&lt;/a>\n";
+  }
+  else {
+    ptr +="&lt;p>The knife is not heating.&lt;/p>&lt;a class=\"button button-on\" href=\"/enable_heating\">ENABLE&lt;/a>\n";
+    ptr +="&lt;p>&lt;/p>&lt;a class=\"button button-on\" href=\"/disable_heating\">DISABLE&lt;/a>\n";
+  }
+  if(temp != -2) {
+    ptr +="&lt;p>Current Temperature: " + String(temp) + "°C&lt;/p>";
+  }
+  
+  ptr +="&lt;/body>\n";
+  ptr +="&lt;/html>\n";
+  return ptr;
+}
+
+void setup() {
+  // Sets up the Serial Monitor.
+  Serial.begin(115200);
+
+  // Sets up T0_temp for the Thermistor.
+  T0_temp = 295.928;
+
+  // Starts a Wi-Fi connection.
+  WiFi.begin(ssid, password);
+  bool wifitest = WiFi.config(local_IP, gateway, subnet_mask, dns);
+  if(!wifitest)
+    Serial.println("The connection might refuse.");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(1000);
+    Serial.println("Connecting to Wi-Fi...");
+  }
+
+  // Prints various addresses to the Serial Monitor.
+  Serial.print("Connected to ");
+  Serial.println(WiFi.localIP());
+  Serial.println(WiFi.subnetMask());
+  Serial.println(WiFi.gatewayIP());
+  Serial.println(WiFi.macAddress());
+
+  // Activates handlers.
+  server.on("/", handle_OnConnect);
+  server.on("/enable_heating", enable_heating);
+  server.on("/disable_heating", disable_heating);
+  server.onNotFound(handle_NotFound);
+
+  // Activates pin modes.
+  pinMode(HEATING_PIN, OUTPUT);
+  server.begin();
+}
+
+void loop() {
+  server.handleClient();
+  currentTemperature = th.readCelsius();
+  // Not used: mcurrentTemperature = checkTempWithThermistor();
+  // Reads the temperature and handles the heating element.
+  Serial.println("Temperature: " + String(currentTemperature));
+  // Other debug messages.
+  Serial.println("IsHeating: " + String(isHeating));
+  if(isHeating)
+  {
+    digitalWrite(HEATING_PIN, HIGH);
+  }
+  else
+  {
+    digitalWrite(HEATING_PIN, LOW);
+  }
+  
+  if(currentTemperature > MAX_TEMPERATURE)
+    isHeating = false;
+
+  // Update temperature HTML.
+  SendHTML(isHeating, currentTemperature);
+  delay(2000/3);
+}
+</code></pre>
+
+<p><a href="../index.html">Go back</a>
+
 </body>
 
 <script src="https://strapdownjs.com/v/0.2/strapdown.js"></script>
